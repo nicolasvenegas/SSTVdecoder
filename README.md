@@ -51,4 +51,4 @@ El archivo final de exportación genera un formato estructurado y predecible de 
 
 ## 🔧 Requisitos de Ejecución
 1. Alojar la estructura en un servidor local básico o entorno web.
-2. Asegurar la llamada correcta a las librerías de p5.js y p5.dom.js.
+2. Asegurar la llamada correcta a las librerías de p5.js y p5.sound.js.
