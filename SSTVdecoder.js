@@ -85,7 +85,65 @@ function setup() {
   botonGuardar.mousePressed(guardarImagenSSTV);
 }
 
+function draw() {
+  background(0);
+  
+  if (imgFinal) {
+    let sWidth = 0;
+    let sHeight = 0;
+    let posX = 0;
+    let posY = 0;
 
+    // DETECCIÓN RESPONSIVA DE PANTALLA
+    if (windowWidth < 900) {
+      // Pantallas pequeñas: Se desplaza ABAJO del menú de control
+      sWidth = windowWidth * 0.85;
+      sHeight = sWidth * (imgHeight / imgWidth);
+      
+      posX = (windowWidth - sWidth) / 2; // Centrado horizontal
+      posY = 340; // Margen de seguridad para que el menú superior respire
+    } else {
+      // Pantallas grandes: Mantiene el diseño original al lado derecho
+      sWidth = windowWidth * 0.55;
+      sHeight = sWidth * (imgHeight / imgWidth);
+      
+      if (sHeight > windowHeight * 0.8) {
+        sHeight = windowHeight * 0.8;
+        sWidth = sHeight * (imgWidth / imgHeight);
+      }
+      posX = (windowWidth - sWidth) / 2 + 120;
+      posY = (windowHeight - sHeight) / 2;
+    }
+    
+    // Renderizado seguro en el Canvas de p5.js
+    image(imgFinal, posX, posY, sWidth, sHeight);
+  }
+  
+  // --- ETIQUETAS DE TEXTO ALINEADAS A LAS CAJAS ---
+  fill(255, 255, 255);
+  noStroke();
+  textSize(11);
+  textAlign(LEFT, CENTER);
+  
+  let textMargenX = 95; 
+  let pasoY = 55;
+
+  text("Reloj (Hz)", textMargenX, 30 + pasoY * 1);
+  text("Desfase (Muestras)", textMargenX, 30 + pasoY * 2);
+  text("Balance Color (YUV)", textMargenX, 30 + pasoY * 3);
+
+  if (estadoMensaje !== "") {
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textSize(22);
+    
+    if (windowWidth < 900) {
+      text(estadoMensaje, width / 2, 450);
+    } else {
+      text(estadoMensaje, width / 2 + 120, height / 2);
+    }
+  }
+}
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -99,7 +157,6 @@ function windowResized() {
   inputChroma.position(margenX, 20 + pasoY * 3);
   botonGuardar.position(margenX, 20 + pasoY * 4 + 10);
 }
-
 
 function limpiarImagenNegro() {
   imgFinal.loadPixels();
@@ -257,14 +314,17 @@ function renderizarLineaYUV(lineaY) {
       let temp = v; v = u; u = temp;
     }
 
+    // Conversión matemática YUV a RGB estándar para el píxel 0
     let r0 = constrain(y0 + 1.402 * v, 0, 255);
     let g0 = constrain(y0 - 0.344136 * u - 0.714136 * v, 0, 255);
     let b0 = constrain(y0 + 1.772 * u, 0, 255);
 
+    // Conversión matemática YUV a RGB estándar para el píxel 1
     let r1 = constrain(y1 + 1.402 * v, 0, 255);
     let g1 = constrain(y1 - 0.344136 * u - 0.714136 * v, 0, 255);
     let b1 = constrain(y1 + 1.772 * u, 0, 255);
 
+    // Inyección de color estructural en el array de píxeles nativo de la imagen
     if (lineaY >= 0 && lineaY < imgHeight) {
       let idx0 = (x + lineaY * imgWidth) * 4;
       imgFinal.pixels[idx0]     = r0;
